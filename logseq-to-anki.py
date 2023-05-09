@@ -66,16 +66,14 @@ def extract_card_from_block(block):
         #  card-last-reviewed:: 2023-05-09T11:54:31.558Z
         #  card-last-score:: 5
         #
-        if meta_pattern.match(line):
-            continue
+        if not meta_pattern.search(line):
+            # extract tags
+            tags.extend(re.findall(hash_pattern, line))
+            # clean
+            clean_line = re.sub(hash_pattern, '', line)
+            clean_line = re.sub(clean_pattern, '', clean_line).strip()
 
-        # extract tags
-        tags.extend(re.findall(hash_pattern, line))
-        # clean
-        clean_line = re.sub(hash_pattern, '', line)
-        clean_line = re.sub(clean_pattern, '', line).strip()
-
-        questionLines.append(clean_line)
+            questionLines.append(clean_line)
 
     return {
         'question': '\n'.join(questionLines),
