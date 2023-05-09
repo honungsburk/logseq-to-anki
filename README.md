@@ -8,4 +8,12 @@ Luckily, it's easy to modify the code to suit your needs.
 ## How it works
 
 I went with the simplest solution which is to read through the Logseq notes and extract the information I need.
-Then create a CSV file that can be imported into Anki.
+Then create a CSV file that can be imported into Anki. It looks like this:
+
+```csv
+{{c1::cloze one}} some text {{c2::cloze two}} some other text?;tag1 tag2
+{{c1::cloze one}} some text {{c2::cloze two}} some other text?;tag1 tag2
+...
+```
+
+you then map the first column to the first field in a cloze card and the second column to the tags field.
