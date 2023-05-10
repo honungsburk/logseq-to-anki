@@ -71,7 +71,8 @@ def extract_card_from_block(block):
             # extract tags
             line_tags = re.findall(hash_pattern, line)
             line_tags = filter(lambda tag: tag != '#card', line_tags)
-            line_tags = [tag.replace('#card-', '') for tag in line_tags]
+            line_tags = [tag.replace('#', '').replace(
+                'card-', '') for tag in line_tags]
             tags.extend(line_tags)
 
             # clean
@@ -124,6 +125,7 @@ if __name__ == '__main__':
     markdown_files = get_all_markdown_files(args.dir)
 
     all_cards = []
+    unique_questions = set()
 
     for file in markdown_files:
         content = get_markdown_content(file)
@@ -131,7 +133,9 @@ if __name__ == '__main__':
         for block in blocks:
             if block_is_card(block):
                 card = extract_card_from_block(block)
-                all_cards.append(card)
+                if card['question'] not in unique_questions:
+                    unique_questions.add(card['question'])
+                    all_cards.append(card)
 
     with open(args.out, "w") as text_file:
         csv = cards_to_csv(all_cards)
