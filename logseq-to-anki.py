@@ -14,7 +14,7 @@ def get_markdown_content(file_path):
         return content
 
 
-block_start_pattern = re.compile(r'^- ')
+block_start_pattern = re.compile(r'^[\t \r]*- ')
 
 
 def is_block_start(line):
@@ -46,6 +46,7 @@ clean_pattern = re.compile(r'^[\s-]+')
 hash_pattern = re.compile(r'#[^\s]+')
 meta_pattern = re.compile(
     r'card-last-interval|card-repeats|card-ease-factor|card-next-schedule|card-last-reviewed|card-last-score')
+cloze_pattern = re.compile(r'{{cloze (.*)}}')
 
 
 def extract_card_from_block(block):
@@ -68,15 +69,33 @@ def extract_card_from_block(block):
         #
         if not meta_pattern.search(line):
             # extract tags
-            tags.extend(re.findall(hash_pattern, line))
+            line_tags = re.findall(hash_pattern, line)
+            line_tags = filter(lambda tag: tag != '#card', line_tags)
+            line_tags = [tag.replace('#card-', '') for tag in line_tags]
+            tags.extend(line_tags)
+
             # clean
             clean_line = re.sub(hash_pattern, '', line)
             clean_line = re.sub(clean_pattern, '', clean_line).strip()
 
+            # escape double quotes by doubling them
+            clean_line = clean_line.replace('"', '""')
             questionLines.append(clean_line)
 
+    question = '\n'.join(questionLines)
+
+    # replace cloze with anki cloze
+    count = 0
+
+    def anki_cloze(m):
+        nonlocal count
+        count += 1
+        return f"{{{{c{count}::{m.group(1)}}}}}"
+
+    question = re.sub(cloze_pattern, anki_cloze, question)
+    # question = re.sub(cloze_pattern, "{{c1::\g<1>}}", question)
     return {
-        'question': '\n'.join(questionLines),
+        'question': question,
         'tags': tags
     }
 
