@@ -17,3 +17,10 @@ Then create a CSV file that can be imported into Anki. It looks like this:
 ```
 
 you then map the first column to the first field in a cloze card and the second column to the tags field.
+
+The output is far from perfect. I still had to do a fair bit of manual work to get the cards into a state where I could use them.
+But it's a lot better than doing it all manually.
+
+```bash
+$ python3 logseq-to-anki.py PATH_TO_LOGSEQ_DATABASE OUTPUT_FILE
+```
